@@ -27,7 +27,7 @@ def write_file(working_directory, file_path, content):
 
 
 schema_write_file = types.FunctionDeclaration(
-    name="run_file",
+    name="write_file",
     description="writes contents into a new or existing file",
     parameters=types.Schema(
         required=["file_path", "content"],

@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from call_function import available_functions
+from call_function import available_functions, call_function
 from prompts import system_prompt
 
 load_dotenv()
@@ -38,8 +38,15 @@ if args.verbose:
     print(f"Prompt tokens: {metadata.prompt_token_count}")
     print(f"Response tokens: {metadata.candidates_token_count}")
 
-if response.function_calls is not None:
-    for function_call in response.function_calls:
-        print(f"Calling function: {function_call.name}({function_call.args})")
-else:
+if response.function_calls is None:
     print(response.text)
+else:
+    function_call_results = []
+    for function_call in response.function_calls:
+        function_call_result = call_function(function_call, args.verbose)
+        if function_call_result.parts is None:
+            raise Exception
+        if function_call_result.parts[0].function_response.response is None:
+            raise Exception
+        function_call_results.append(function_call_result.parts[0])
+        print(f"-> {function_call_result.parts[0].function_response.response}")
